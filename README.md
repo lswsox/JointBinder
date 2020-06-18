@@ -1,4 +1,6 @@
 # JointBinder
+YouTube Video : https://youtu.be/H8opKtMH2QY
+
 [ ENG ]<BR>
 The character joint of Unity 3D has a problem of tearing in extreme movement. The Joint Binder script ensures that the joints do not deviate beyond their specified range from the default position.<BR>
 Also, Unity Physics can't avoid the problem of bone twisting. If the bone is twisted, Candy Wrap occurs on the skinned mesh. Joint Binder straightens the bone so that it is not twisted.<BR>
