@@ -76,17 +76,24 @@ public class JointBinder : MonoBehaviour
         Vector3[] wLookPositions = new Vector3[m_rigidbodies.Count];
         wPositions[0] = m_rigidbodies[0].position;
         wLookPositions[0] = Vector3.zero; // 0은 쓰지 않지만 채워둔다.
+
+        // 리지드바디가 부모자식간으로 연결된 경우도 있을 수 있어서 트위스트에 개입하기 전에 wPositions와 wLookPositions를 미리 조사한다.
         for (int i = 1; i < m_rigidbodies.Count; i++)
         {
             wPositions[i] = m_rigidbodies[i].position;
             float dist = Vector3.Distance(wPositions[i], wPositions[i - 1]);
             wLookPositions[i] = m_rigidbodies[i].transform.TransformPoint(new Vector3(0f, -dist, 0f));
+        }
+
+        // 미리 조사한 wPositions와 wLookPositions를 기반으로 트위스트에 개입
+        for (int i = 1; i < m_rigidbodies.Count; i++)
+        {
             Vector3 lookVector = (wLookPositions[i] - wPositions[i - 1]).normalized;
             Vector3 up = m_rigidbodies[i - 1].transform.right;
             Vector3 crossVector = Vector3.Cross(lookVector, up); // Twist가 전혀 없는 LookAt용 Up 벡터 (크로스 연산 결과 만들어진 벡터)
             Vector3 upOriginal = m_rigidbodies[i].transform.forward; // Twist가 발생하는 원래 피직스의 LookAt용 Up 벡터
             Vector3 upLerp = Vector3.Lerp(upOriginal, crossVector, m_bindTwistStrength); // Twist가 너무 없어도 자연스럽지 않으니 Lerp로 보간해서 사용함. (천천히 Twist가 풀리도록)
-            
+
             // transform.LookAt을 쿼터니언 Quaternion.LookRotation으로 테스트 해봤으나 피직스 안정성이 떨어져서 transform.LookAt을 사용함.
             m_rigidbodies[i].transform.LookAt(wLookPositions[i], upLerp); // cross 벡터 위치를 바라본다.
             m_rigidbodies[i].transform.Rotate(new Vector3(-90f, 0f, 0f)); // 축 방향 보정
